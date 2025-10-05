@@ -6,8 +6,18 @@ import ws from 'ws'
 const linkRegex = /https:\/\/chat\.whatsapp\.com\/([0-9A-Za-z]{20,24})/i
 const handler = async (m, { conn, command, usedPrefix, text }) => {
 try {
-const isSubBots = [conn.user.jid, ...global.owner.map(([number]) => `${number}@s.whatsapp.net`)].includes(m.sender)
-if (!isSubBots) return m.reply(`❀ El comando *${command}* solo puede ser ejecutado por el Socket.`)
+// ==================================================
+// ===          CÓDIGO DE PERMISOS CORREGIDO        ===
+// ==================================================
+// Comprueba si el remitente está en la lista de owners.
+const isOwner = global.owner.map(owner => owner[0] + '@s.whatsapp.net').includes(m.sender)
+
+// Si el remitente NO es un owner Y TAMPOCO es el propio bot, entonces deniega el acceso.
+if (!isOwner && m.sender !== conn.user.jid) {
+  return m.reply(`❀ El comando *${command}* solo puede ser ejecutado por un *Owner* del Bot.`)
+}
+// ==================================================
+
 switch (command) {
 case 'self': case 'public': case 'antiprivado': case 'antiprivate': case 'gponly': case 'sologp': {
 const config = global.db.data.settings[conn.user.jid]
