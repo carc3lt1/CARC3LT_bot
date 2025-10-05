@@ -11,6 +11,14 @@ global.botNumber = "" //Ejemplo: 573218138672
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
+// ==================================================
+// ===       CONFIGURACIÓN DE LA API DE GEMINI      ===
+// ==================================================
+// Lee la clave de API de Gemini desde las variables de entorno (archivo .env)
+global.gemini_api_key = process.env.GEMINI_API_KEY || '';
+// ==================================================
+
+
 global.owner = [
 "50240286885",
 "50235195260",
