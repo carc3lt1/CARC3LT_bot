@@ -24,30 +24,30 @@ global.prems = []
 
 global.libreria = "Baileys Multi Device"
 global.vs = "^1.8.2|Latest"
-global.nameqr = "YukiBot-MD"
-global.sessions = "Sessions/Principal"
+global.nameqr = "CARC3LT_bot"
+global.sessions = "Sessions/👑Rey🤴"
 global.jadi = "Sessions/SubBot"
 global.yukiJadibts = true
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.botname = "ᥡᥙkі sᥙ᥆ᥙ"
-global.textbot = "ᥡᥙkі, mᥲძᥱ ᥕі𝗍һ ᑲᥡ ⁱᵃᵐ|𝔇ĕ𝐬†𝓻⊙γ"
-global.dev = "© ⍴᥆ᥕᥱrᥱძ ᑲᥡ ⁱᵃᵐ|𝔇ĕ𝐬†𝓻⊙γ𒆜"
-global.author = "© mᥲძᥱ ᥕі𝗍һ ᑲᥡ ⁱᵃᵐ|𝔇ĕ𝐬†𝓻⊙γ𒆜"
-global.etiqueta = "ⁱᵃᵐ|𝔇ĕ𝐬†𝓻⊙γ𒆜"
+global.botname = "CARC3LT_bot"
+global.textbot = "CARC3LT_bot, mᥲძᥱ ᥕі𝗍һ ᑲᥡ ⁱᵃᵐ|CARC3LT"
+global.dev = "© ⍴᥆ᥕᥱrᥱძ ᑲᥡ ⁱᵃᵐ|CARC3LT𒆜"
+global.author = "© mᥲძᥱ ᥕі𝗍һ ᑲᥡ ⁱᵃᵐ|CARC3LT𒆜"
+global.etiqueta = "ⁱᵃᵐ|CARC3LT𒆜"
 global.currency = "Quetzales"
 global.banner = "https://raw.githubusercontent.com/carc3lt1/CARC3LT_bot/252e9e26790a20069cc7ceee20c39b5142491e71/lib/catalogo.jpg"
-global.icono = "https://raw.githubusercontent.com/The-King-Destroy/Adiciones/main/Contenido/1742678797993.jpeg"
+global.icono = "https://raw.githubusercontent.com/carc3lt1/CARC3LT_bot/252e9e26790a20069cc7ceee20c39b5142491e71/lib/catalogo.jpg"
 global.catalogo = fs.readFileSync('./lib/catalogo.jpg')
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
-global.group = "https://chat.whatsapp.com/HaKf6ezcwdbGzmH782eBal"
-global.community = "https://chat.whatsapp.com/G0kXqsteJFU74yrLtg79o6"
-global.channel = "https://whatsapp.com/channel/0029Vb64nWqLo4hb8cuxe23n"
-global.github = "https://github.com/The-King-Destroy/YukiBot-MD"
-global.gmail = "thekingdestroy507@gmail.com"
+global.group = "https://chat.whatsapp.com"
+global.community = "https://chat.whatsapp.com"
+global.channel = "https://whatsapp.com"
+global.github = "https://github.com/carc3lt1/CARC3LT_bot"
+global.gmail = "admin@carc3lt.tk"
 global.ch = {
 ch1: "120363401404146384@newsletter"
 }
