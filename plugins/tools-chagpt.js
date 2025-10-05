@@ -1,73 +1,75 @@
-import FormData from "form-data"
-import { fileTypeFromBuffer } from "file-type"
-import axios from "axios"
-import fetch from "node-fetch"
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 
-const handler = async (m, { conn, command, usedPrefix, text, args }) => {
-try {
-const q = m.quoted ? m.quoted : m
-const mime = (q.msg || q).mimetype || ''
-const username = await (async () => global.db.data.users[m.sender].name || (async () => { try { const n = await conn.getName(m.sender); return typeof n === 'string' && n.trim() ? n : m.sender.split('@')[0] } catch { return m.sender.split('@')[0] } })())()
-switch (command) {
-case 'dalle': {
-if (!args[0]) return conn.reply(m.chat, `❀ Por favor, proporciona una descripción para generar la imagen.`, m)
-const promptDalle = args.join(' ')
-if (promptDalle.length < 5) return conn.reply(m.chat, `ꕥ La descripción es demasiado corta.`, m)
-await m.react('🕒')
-const dalleURL = `https://eliasar-yt-api.vercel.app/api/ai/text2img?prompt=${encodeURIComponent(promptDalle)}`
-const dalleRes = await axios.get(dalleURL, { responseType: 'arraybuffer' })
-await conn.sendMessage(m.chat, { image: Buffer.from(dalleRes.data) }, { quoted: m })
-await m.react('✔️')
-break
+// Intenta inicializar con la clave de API desde las configuraciones globales
+let genAI;
+if (global.gemini_api_key) {
+  try {
+    genAI = new GoogleGenerativeAI(global.gemini_api_key);
+  } catch (e) {
+    console.error("Error al inicializar GoogleGenerativeAI, verifica tu clave de API:", e);
+  }
 }
-case 'flux': {
-if (!text) return conn.reply(m.chat, `❀ Por favor, ingrese un término para generar la imagen`, m)
-await m.react('🕒')
-const result = await fluximg.create(text)
-if (result?.imageLink) {
-await conn.sendMessage(m.chat, { image: { url: result.imageLink }, caption: `❀ *Resultados de:* ${text}` }, { quoted: m })
-await m.react('✔️')
-} else throw new Error("No se pudo crear la imagen")
-break
-}
-case 'ia': case 'chatgpt': {
-if (!text) return conn.reply(m.chat, `❀ Ingrese una petición.`, m)
-await m.react('🕒')
-const basePrompt = `Tu nombre es ${botname} y parece haber sido creada por ${etiqueta}. Tu versión actual es ${vs}, Tú usas el idioma Español. Llamarás a las personas por su nombre ${username}, te gusta ser divertida, y te encanta aprender. Lo más importante es que debes ser amigable con la persona con la que estás hablando. ${username}`
-const url = `${global.APIs.delirius.url}/ia/gptprompt?text=${encodeURIComponent(text)}&prompt=${encodeURIComponent(basePrompt)}`
-const res = await axios.get(url)
-if (!res.data?.status || !res.data?.data) throw new Error('Respuesta inválida de Delirius')
-await conn.sendMessage(m.chat, { text: res.data.data }, { quoted: m })
-await m.react('✔️')
-break
-}
-case 'luminai': case 'gemini': case 'bard': {
-if (!text) return conn.reply(m.chat, `❀ Ingrese una petición.`, m)
-await m.react('🕒')
-const apiMap = { luminai: 'qwen-qwq-32b', gemini: 'gemini', bard: 'grok-3-mini' }
-const endpoint = apiMap[command]
-const url = `${global.APIs.zenzxz.url}/ai/${endpoint}?text=${encodeURIComponent(text)}`
-const res = await axios.get(url)
-const output = res.data?.response || res.data?.assistant
-if (!res.data?.status || !output) throw new Error(`Respuesta inválida de ${command}`)
-await conn.sendMessage(m.chat, { text: output }, { quoted: m })
-await m.react('✔️')
-break
-}}} catch (error) {
-await m.react('✖️')
-conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${error.message}`, m)
-}}
 
-handler.command = ['gemini', 'bard', 'openai', 'dalle', 'flux', 'ia', 'chatgpt', 'luminai']
-handler.help = ['gemini', 'bard', 'openai', 'dalle', 'flux', 'ia', 'chatgpt', 'luminai']
-handler.tags = ['tools']
-handler.group = true
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+  // Comprueba si la clave de API fue cargada
+  if (!genAI) throw `*[❗] LA CLAVE DE API DE GEMINI NO HA SIDO CONFIGURADA.*\n\nPor favor, configura la variable 'GEMINI_API_KEY' en tu archivo .env`;
+  if (!text) throw `*[❗] INGRESA UN TEXTO PARA CREAR LA IMAGEN*\n\n*—◉ Ejemplo:*\n*${usedPrefix + command} Un león cyberpunk en una ciudad de neón*`;
 
-export default handler
+  try {
+    await m.react('🪄');
+    conn.reply(m.chat, '*[❗] Creando tu imagen con Gemini y Prodia, por favor espera un momento...*', m);
 
-const fluximg = { defaultRatio: "2:3", create: async (query) => {
-const config = { headers: { accept: "*/*", authority: "1yjs1yldj7.execute-api.us-east-1.amazonaws.com", "user-agent": "Postify/1.0.0" }}
-const url = `https://1yjs1yldj7.execute-api.us-east-1.amazonaws.com/default/ai_image?prompt=${encodeURIComponent(query)}&aspect_ratio=${fluximg.defaultRatio}`
-const res = await axios.get(url, config)
-return { imageLink: res.data.image_link }
-}}
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const prompt = `Generate a descriptive and visually rich prompt for an AI image generator. The user wants an image of: "${text}". Expand on this with creative details, focusing on artistic style, lighting, and composition.`;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const enhancedPrompt = response.text();
+
+    const apiUrl = `https://api.prodia.com/v1/sdxl/generate`;
+    
+    const apiResponse = await axios.post(apiUrl, {
+      prompt: enhancedPrompt,
+      model: 'sd_xl_base_1.0.safensors [be9edd61]',
+      sampler: 'DPM++ 2M Karras'
+    }, {
+      headers: {
+        'X-Prodia-Key': '2932551a-f32f-41a4-a48a-40a17a7834a3' // Clave pública de ejemplo para Prodia
+      }
+    });
+
+    const jobId = apiResponse.data.job;
+    if (!jobId) throw new Error('No se pudo iniciar el trabajo de generación de imagen.');
+
+    let imageUrl = '';
+    for (let i = 0; i < 20; i++) { 
+      const jobResponse = await axios.get(`https://api.prodia.com/v1/job/${jobId}`);
+      if (jobResponse.data.status === 'succeeded') {
+        imageUrl = jobResponse.data.imageUrl;
+        break;
+      } else if (jobResponse.data.status === 'failed') {
+        throw new Error('La generación de la imagen falló en el servidor de Prodia.');
+      }
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+
+    if (!imageUrl) throw new Error('No se pudo obtener la URL de la imagen a tiempo.');
+
+    await conn.sendFile(m.chat, imageUrl, 'imagen_generada.png', `*Imagen generada con IA para:*\n*${text}*`, m);
+    await m.react('✅');
+
+  } catch (error) {
+    await m.react('❌');
+    console.error('Error en el comando .gemini:', error);
+    m.reply('*[❗] Lo siento, ocurrió un error. La API podría estar saturada o tu clave de Gemini no es válida. Por favor, inténtalo de nuevo.*');
+  }
+};
+
+// Hemos actualizado los comandos para reflejar la nueva funcionalidad
+handler.help = ['gemini <texto>', 'crearimagen <texto>'];
+handler.tags = ['ai'];
+handler.command = /^(gemini|iaimagen|crearimagen)$/i; // Ahora el comando principal es gemini, pero también responde a los otros
+handler.premium = false;
+handler.limit = true;
+
+export default handler;
