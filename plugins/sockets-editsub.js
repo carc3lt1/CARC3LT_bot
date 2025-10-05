@@ -5,14 +5,8 @@ const handler = async (m, { conn, command, usedPrefix, text }) => {
 // =======================================================
 // === CÓDIGO DE PERMISOS DEFINITIVO PARA ESTE BOT ===
 // =======================================================
-// El 'global.owner' es una lista de strings: ["numero1", "numero2"]
-// Creamos un array de JIDs completos para comparar
 const ownerJids = global.owner.map(owner => owner + '@s.whatsapp.net');
-
-// Comprobamos si el remitente está en la lista de owners o si es el propio bot.
 const isAllowed = ownerJids.includes(m.sender) || m.sender === conn.user.jid;
-
-// Si no está permitido, denegamos el acceso.
 if (!isAllowed) {
     return m.reply(`❀ El comando *${command}* solo puede ser ejecutado por un *Owner* del Bot.`);
 }
