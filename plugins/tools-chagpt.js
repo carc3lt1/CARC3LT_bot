@@ -1,4 +1,4 @@
-import axios from 'axios';
+import fetch from 'node-fetch'; // Usamos node-fetch, que ya es parte del proyecto
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) throw `*[❗] INGRESA UN TEXTO PARA CREAR LA IMAGEN*\n\n*—◉ Ejemplo:*\n*${usedPrefix + command} Un león cyberpunk en una ciudad de neón*`;
@@ -7,12 +7,19 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     await m.react('🪄');
     conn.reply(m.chat, '*[❗] Creando tu imagen con una IA, por favor espera un momento...*', m);
 
-    // Usamos la API pública de xyro.site que no requiere clave.
+    // Usamos la API pública de xyro.site
     const apiUrl = `https://api.xyro.site/api/ai/imggen?prompt=${encodeURIComponent(text)}`;
     
-    // La API devuelve la imagen directamente como un buffer de datos.
-    const response = await axios.get(apiUrl, { responseType: 'arraybuffer' });
-    const imageBuffer = Buffer.from(response.data, 'binary');
+    // Hacemos la petición con node-fetch
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+        // Si la respuesta no es exitosa (ej: 404, 500), lanzamos un error
+        throw new Error(`La API devolvió un error: ${response.status} ${response.statusText}`);
+    }
+    
+    // Convertimos la respuesta en un buffer de datos
+    const imageBuffer = await response.buffer();
 
     // Comprobación básica de que es una imagen válida (más de 5KB)
     if (!imageBuffer || imageBuffer.length < 5000) {
@@ -25,9 +32,16 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   } catch (error) {
     await m.react('❌');
-    console.error('Error en el comando .crearimagen:', error);
-    m.reply('*[❗] Lo siento, ocurrió un error. La API podría estar saturada o no disponible. Por favor, inténtalo de nuevo más tarde.*');
+    // Imprimimos el error en la consola para un mejor diagnóstico
+    console.error('Error detallado en .crearimagen:', error);
+    m.reply('*[❗] Lo siento, ocurrió un error al intentar crear la imagen. La API podría estar no disponible. Revisa los logs para más detalles.*');
   }
 };
 
-// Puedes personalizar los coma
+handler.help = ['crearimagen <texto>'];
+handler.tags = ['ai'];
+handler.command = /^(crearimagen|iaimagen|gemini)$/i;
+handler.premium = false;
+handler.limit = true;
+
+export default handler;
