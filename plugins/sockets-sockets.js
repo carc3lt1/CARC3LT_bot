@@ -6,17 +6,21 @@ import ws from 'ws'
 const linkRegex = /https:\/\/chat\.whatsapp\.com\/([0-9A-Za-z]{20,24})/i
 const handler = async (m, { conn, command, usedPrefix, text }) => {
 try {
-// ==================================================
-// ===          CÓDIGO DE PERMISOS CORREGIDO        ===
-// ==================================================
-// Comprueba si el remitente está en la lista de owners.
-const isOwner = global.owner.map(owner => owner[0] + '@s.whatsapp.net').includes(m.sender)
+// =======================================================
+// === CÓDIGO DE PERMISOS DEFINITIVO PARA ESTE BOT ===
+// =======================================================
+// El 'global.owner' es una lista de strings: ["numero1", "numero2"]
+// Creamos un array de JIDs completos para comparar
+const ownerJids = global.owner.map(owner => owner + '@s.whatsapp.net');
 
-// Si el remitente NO es un owner Y TAMPOCO es el propio bot, entonces deniega el acceso.
-if (!isOwner && m.sender !== conn.user.jid) {
-  return m.reply(`❀ El comando *${command}* solo puede ser ejecutado por un *Owner* del Bot.`)
+// Comprobamos si el remitente está en la lista de owners o si es el propio bot.
+const isAllowed = ownerJids.includes(m.sender) || m.sender === conn.user.jid;
+
+// Si no está permitido, denegamos el acceso.
+if (!isAllowed) {
+    return m.reply(`❀ El comando *${command}* solo puede ser ejecutado por un *Owner* del Bot.`);
 }
-// ==================================================
+// =======================================================
 
 switch (command) {
 case 'self': case 'public': case 'antiprivado': case 'antiprivate': case 'gponly': case 'sologp': {
