@@ -40,35 +40,38 @@ m.reply(`❀ XP Añadido: *${xp}* \n@${who.split('@')[0]}, recibiste ${xp} XP`, 
 break
 }
 case 'addprem': {
-if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')
-if (!user[who]) user[who] = { premiumTime: 0, premium: false }
-const premArgs = text.split(' ').filter(arg => arg)
-if (premArgs.length < 2) return m.reply('ꕥ Envía un tiempo válido\n> Ejemplo (1h, 2d, 3s, 4m).')
-await m.react('🕒')
-let tiempo = 0
-const cant = parseInt(premArgs[0])
-const unidad = premArgs[1]
-if (unidad === 'h') tiempo = 3600000 * cant
-else if (unidad === 'd') tiempo = 86400000 * cant
-else if (unidad === 's') tiempo = 604800000 * cant
-else if (unidad === 'm') tiempo = 2592000000 * cant
-else return m.react('✖️'), m.reply('ꕥ Tiempo inválido.\nOpciones:\n h = horas, d = días, s = semanas, m = meses')
-user[who].premiumTime = now < user[who].premiumTime ? user[who].premiumTime + tiempo : now + tiempo
-user[who].premium = true
-const timeLeft = await formatTime(user[who].premiumTime - now)
-await m.react('✔️')
-m.reply(`✰ Nuevo Usuario Premium!!!\n\nᰔᩚ Usuario » @${who.split('@')[0]}\nⴵ Tiempo Premium » ${cant}${unidad}\n✧ Tiempo Restante » ${timeLeft}`, null, { mentions: [who] })
-break
-}
-case 'delprem': {
-if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')  
-if (!user[who]?.premiumTime) return m.react('✖️'), m.reply('ꕥ El usuario no es premium.')
-await m.react('🕒')
-user[who].premiumTime = 0
-user[who].premium = false
-await m.react('✔️')
-m.reply(`❀ @${who.split('@')[0]} ya no es usuario premium.`, null, { mentions: [who] })
-break
+    if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')
+    if (!user[who]) user[who] = { premiumTime: 0, premium: false }
+    
+    // --- CÓDIGO CORREGIDO ---
+    // Elimina la mención del texto para obtener solo los argumentos de tiempo.
+    const timeArgs = text.replace(/@\d+/g, '').trim().split(' ')
+    if (timeArgs.length < 1 || !timeArgs[0]) return m.reply('ꕥ Envía un tiempo válido\n> Ejemplo (1h, 2d, 3s, 4m).')
+    
+    const timeString = timeArgs[0] // ej: "30d", "1h"
+    const cant = parseInt(timeString) // ej: 30, 1
+    const unidad = timeString.replace(cant, '').toLowerCase() // ej: "d", "h"
+    // -------------------------
+
+    await m.react('🕒')
+    let tiempo = 0
+
+    if (isNaN(cant)) return m.react('✖️'), m.reply('ꕥ Cantidad de tiempo no válida.')
+
+    if (unidad === 'h') tiempo = 3600000 * cant
+    else if (unidad === 'd') tiempo = 86400000 * cant
+    else if (unidad === 's') tiempo = 604800000 * cant
+    else if (unidad === 'm') tiempo = 2592000000 * cant
+    else return m.react('✖️'), m.reply('ꕥ Formato de tiempo inválido.\nOpciones:\n h = horas, d = días, s = semanas, m = meses')
+    
+    user[who].premiumTime = now < user[who].premiumTime ? user[who].premiumTime + tiempo : now + tiempo
+    user[who].premium = true
+    
+    const timeLeft = await formatTime(user[who].premiumTime - now)
+    
+    await m.react('✔️')
+    m.reply(`✰ Nuevo Usuario Premium!!!\n\nᰔᩚ Usuario » @${who.split('@')[0]}\nⴵ Tiempo Premium » ${cant}${unidad}\n✧ Tiempo Restante » ${timeLeft}`, null, { mentions: [who] })
+    break
 }
 case 'listprem': {
 await m.react('🕒')
