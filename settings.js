@@ -25,7 +25,7 @@ global.prems = []
 global.libreria = "Baileys Multi Device"
 global.vs = "^1.8.2|Latest"
 global.nameqr = "CARC3LT_bot"
-global.sessions = "Sessions/👑Rey🤴"
+global.sessions = "Sessions/Principal"
 global.jadi = "Sessions/SubBot"
 global.yukiJadibts = true
 
