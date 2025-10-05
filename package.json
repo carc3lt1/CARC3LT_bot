@@ -9,7 +9,7 @@
     "plugins": "plugins"
   },
   "scripts": {
-    "start": "node -r dotenv/config index.js"
+    "start": "node index.js",
   },
   "repository": {
     "type": "git",
